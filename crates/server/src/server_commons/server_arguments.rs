@@ -1,10 +1,7 @@
 use serde::{Deserialize, Serialize};
 use structopt::StructOpt;
 
-use crate::{
-    constants::{DATA_DIR, WEB_PORT},
-    MODE,
-};
+use crate::{DATA_DIR, MODE, WEB_PORT};
 
 #[derive(Debug, StructOpt, Serialize, Deserialize)]
 #[structopt(name = "MiniStorage", about = "An example of StructOpt usage.")]

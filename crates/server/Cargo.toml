@@ -1,18 +1,21 @@
 [package]
-name = "twist_server"
+name = "twist_drive_server"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = { version = "0.6.20", features = ["multipart"] }
+axum = { version = "0.6", features = ["multipart", "json", "tokio", "query"] }
 chrono = "0.4.27"
-lance = "0.6.2"
+
 log = "0.4.20"
 log4rs = { version = "1.2.0", features = ["gzip"] }
-serde = "1.0.188"
+serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.105"
 structopt = "0.3.26"
-tokio = "1.32.0"
-twist_core = { path = "../core" }
+tokio = { version = "1", features = ["full"] }
+tokio-util = { version = "0.7.8", features = ["io"] }
+twist_drive_core = { path = "../core" }
+tower = { version = "0.4", features = ["util"] }
+tower-http = { version = "0.4", features = ["fs", "trace"] }

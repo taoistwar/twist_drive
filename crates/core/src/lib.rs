@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = file::file_md5("cargo.toml");
+        let result = file::file_hash("cargo.toml");
         println!("{}", result);
     }
 }

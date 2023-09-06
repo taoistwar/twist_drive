@@ -1,0 +1,36 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "twist_drive_client upload demo",
+      "cargo": {
+        "args": ["build", "--bin=twist_drive_client", "--package=twist_drive_client"],
+        "filter": {
+          "name": "twist_drive_client",
+          "kind": "bin"
+        }
+      },
+      "args": ["-a", "upload", "-s", "localhost:3000", "-r", "logs", "-l", "README.md"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "twist_drive_client download demo",
+      "cargo": {
+        "args": ["build", "--bin=twist_drive_client", "--package=twist_drive_client"],
+        "filter": {
+          "name": "twist_drive_client",
+          "kind": "bin"
+        }
+      },
+      "args": ["-a", "download", "-s", "localhost:3000", "-r", "logs/test/winhttp.dll", "-l", "tmp"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
