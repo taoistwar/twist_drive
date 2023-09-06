@@ -1,10 +1,10 @@
 use std::{
-    fs::{self, File},
+    fs::{self},
     path::Path,
 };
 
 use anyhow::Context;
-use twist_drive_core::{file_hash, get_file_name, FileSign};
+use twist_drive_core::{file_hash, FileSign};
 
 use crate::{ClientError, Opt};
 
@@ -39,7 +39,7 @@ async fn do_download(
 ) -> anyhow::Result<()> {
     let client = reqwest::Client::builder().build()?;
 
-    let remote_data_dir = if remote_data_dir.starts_with("/") {
+    let remote_data_dir = if remote_data_dir.starts_with('/') {
         remote_data_dir[1..].to_string()
     } else {
         remote_data_dir.to_string()
@@ -92,7 +92,7 @@ fn save_file(
         }
     }
 
-    let mut f = std::fs::File::create(&file)?;
+    let mut f = std::fs::File::create(file)?;
     use std::io::prelude::*;
     f.write_all(data)?;
     f.flush()?;
