@@ -27,5 +27,6 @@ async fn parse(args: &Opt) -> anyhow::Result<()> {
             print!("unknown action:{}", &args.action);
         }
     }
+    println!("action ok!");
     Ok(())
 }

@@ -14,6 +14,10 @@ pub enum ClientError {
     Reqwest(#[from] reqwest::Error),
     #[error("io fail")]
     IO(#[from] std::io::Error),
+    #[error("fail: {msg:?}")]
+    ActionFail { msg: String },
+    #[error("serde json fail")]
+    SerdeJson(#[from] serde_json::Error),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

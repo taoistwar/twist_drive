@@ -1,4 +1,4 @@
-use anyhow::{Context, Ok};
+use anyhow::Context;
 use log::{debug, error};
 use reqwest::{
     multipart::{Form, Part},
@@ -9,7 +9,7 @@ use twist_drive_core::{file_hash, get_file_name, CommonResp, FileSign};
 
 use crate::{ClientError, Opt};
 
-pub async fn upload(args: &Opt) -> anyhow::Result<(), ClientError> {
+pub async fn upload(args: &Opt) -> Result<(), ClientError> {
     if !Path::new(&args.local_data_dir).exists() {
         error!("local data dir: {} not exists", &args.local_data_dir);
         return Ok(());
@@ -49,7 +49,7 @@ async fn do_upload(
     remote_data_dir: &str,
     hash: &str,
     file_name: String,
-) -> anyhow::Result<(), ClientError> {
+) -> Result<(), ClientError> {
     let client = reqwest::Client::builder().build()?;
 
     let local_data_dir: String = local_data_dir.to_string().clone();
@@ -72,7 +72,7 @@ async fn do_upload(
         debug!("upload response: {:?}", &response);
         if !response.status {
             println!("upload fail");
-            return Err();
+            return Err(ClientError::ActionFail { msg: response.msg });
         }
         return Ok(());
     }
@@ -85,7 +85,7 @@ async fn is_exists(
     remote_data_dir: &str,
     size: u64,
     server: &str,
-) -> anyhow::Result<bool, ClientError> {
+) -> Result<bool, ClientError> {
     let client = Client::builder().build()?;
     let url = format!("http://{}/api/exists", server);
 
