@@ -1,20 +1,18 @@
 use axum::{http::StatusCode, Json};
 
 use std::{fs, path::Path};
-use twist_drive_core::{file_hash, FileSign};
-
-use crate::CommonResp;
+use twist_drive_core::{file_hash, CommonResp, FileSign};
 
 use super::{resp_err, resp_ok};
 
-static EMPTY_FILE_MD5: &str = "d41d8cd98f00b204e9800998ecf8427e";
+static EMPTY_FILE_SHA2: &str = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
 pub async fn exists_route(Json(payload): Json<FileSign>) -> (StatusCode, Json<CommonResp>) {
-    if payload.hash.eq_ignore_ascii_case(EMPTY_FILE_MD5) {
+    if payload.hash.eq_ignore_ascii_case(EMPTY_FILE_SHA2) {
         return resp_err("source file is empty");
     }
-    if payload.hash.len() != EMPTY_FILE_MD5.len() {
-        return resp_err("source file md5 error");
+    if payload.hash.len() != EMPTY_FILE_SHA2.len() {
+        return resp_err("source file hash error");
     }
 
     let file = payload.file;
@@ -33,9 +31,9 @@ pub async fn exists_route(Json(payload): Json<FileSign>) -> (StatusCode, Json<Co
             return resp_err("file size not match, need reupload");
         }
     }
-    // md5相同
-    let md5 = file_hash(&file);
-    if md5 != payload.hash {
+    // hash相同
+    let hash = file_hash(&file);
+    if hash != payload.hash {
         return resp_err("file sign not match, need reupload");
     }
 

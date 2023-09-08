@@ -57,6 +57,7 @@ pub fn get_file_dir(path: &str) -> String {
     path.into()
 }
 
+///
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileSign {
     pub hash: String,
@@ -67,6 +68,12 @@ pub struct FileSign {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FilePath {
     pub file: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CommonResp {
+    pub status: bool,
+    pub msg: String,
 }
 
 #[cfg(test)]
@@ -103,5 +110,12 @@ mod tests {
             hash,
             "9f5959a81214322c8246d4915308bceb06ad23f9675b20b9e88b39e028a93bfd"
         );
+    }
+    #[test]
+    fn test_empty_hash() {
+        let hash = Sha256::new();
+        let res = hash.finalize();
+
+        println!("{}", base16ct::lower::encode_string(&res));
     }
 }

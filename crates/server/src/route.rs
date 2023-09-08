@@ -5,7 +5,8 @@ mod upload_route;
 use axum::{http::StatusCode, Json};
 pub use download_route::*;
 pub use exists_route::*;
-use serde::{Deserialize, Serialize};
+
+use twist_drive_core::CommonResp;
 pub use upload_route::*;
 
 pub fn resp_err(msg: &str) -> (StatusCode, Json<CommonResp>) {
@@ -26,10 +27,4 @@ pub fn resp_ok(msg: &str) -> (StatusCode, Json<CommonResp>) {
             msg: msg.into(),
         }),
     )
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct CommonResp {
-    status: bool,
-    msg: String,
 }

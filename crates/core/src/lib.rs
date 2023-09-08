@@ -1,6 +1,8 @@
 mod file;
+mod logs;
 
 pub use file::*;
+pub use logs::*;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right

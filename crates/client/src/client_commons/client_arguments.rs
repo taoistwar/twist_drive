@@ -9,7 +9,7 @@ pub struct Opt {
     pub server: String,
     #[structopt(short = "l", long = "local-data-dir")]
     pub local_data_dir: String,
-    #[structopt(short = "r", long = "remote-data-dir", default_value = "")]
+    #[structopt(short = "r", long = "remote-data-dir")]
     pub remote_data_dir: String,
     #[structopt(short = "m", long = "mode", default_value = "dev")]
     pub mode: String,

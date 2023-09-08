@@ -8,9 +8,9 @@ use twist_drive_core::{file_hash, FileSign};
 
 use crate::{ClientError, Opt};
 
-pub async fn download(args: &Opt) -> anyhow::Result<()> {
+pub async fn download(args: &Opt) -> anyhow::Result<(), ClientError> {
     if Path::new(&args.local_data_dir).exists() {
-        let md5 = file_hash(&args.local_data_dir);
+        let hash = file_hash(&args.local_data_dir);
         let meta = fs::metadata(&args.local_data_dir)
             .with_context(|| format!("get file meta fail: {}", &args.local_data_dir))?;
 
@@ -20,7 +20,7 @@ pub async fn download(args: &Opt) -> anyhow::Result<()> {
             args.remote_data_dir.clone()
         };
 
-        if is_exists(&md5, &local_data_dir, meta.len(), &args.server).await? {
+        if is_exists(&hash, &local_data_dir, meta.len(), &args.server).await? {
             println!("file exists:{}", &args.remote_data_dir);
             return Ok(());
         }
@@ -36,19 +36,20 @@ async fn do_download(
     local_data_dir: &str,
     remote_data_dir: &str,
     server: &str,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<(), ClientError> {
     let client = reqwest::Client::builder().build()?;
 
-    let remote_data_dir = if remote_data_dir.starts_with('/') {
-        remote_data_dir[1..].to_string()
+    let remote_data_dir = if let Some(end) = remote_data_dir.strip_prefix('/') {
+        end
     } else {
-        remote_data_dir.to_string()
+        remote_data_dir
     };
+
     let url = format!("http://{}/api/download/{}", server, remote_data_dir);
     let request = client.request(reqwest::Method::GET, url);
     let response = request.send().await?;
     let data = response.bytes().await?;
-    save_file(local_data_dir, &remote_data_dir, &data)?;
+    save_file(local_data_dir, remote_data_dir, &data)?;
     Ok(())
 }
 

@@ -1,9 +1,9 @@
 use axum::{body::Bytes, extract::Multipart, http::StatusCode, Json};
-use twist_drive_core::bytes_hash;
+use twist_drive_core::{bytes_hash, CommonResp};
 
 use std::{fs, path::Path};
 
-use crate::{CommonResp, DATA_DIR};
+use crate::DATA_DIR;
 use std::io::prelude::*;
 
 use super::{resp_err, resp_ok};
@@ -26,7 +26,7 @@ pub async fn upload_route(files: Multipart) -> (StatusCode, Json<CommonResp>) {
                             return resp_err("file data empty");
                         }
                         if !bytes_hash(&data).eq_ignore_ascii_case(&hash) {
-                            return resp_err("file data & hash(md5) not match");
+                            return resp_err("file data & hash(sha-2) not match");
                         }
                         match save_file(&name, &path, &data) {
                             Ok(_) => resp_ok("had saved"),
@@ -53,7 +53,7 @@ async fn parse_input(
     let mut data: Option<Bytes> = None;
     let mut name: Option<String> = None;
     let mut path: Option<String> = None;
-    let mut hash: Option<String> = None; // md5
+    let mut hash: Option<String> = None; // sha-2
 
     while let Some(file) = files.next_field().await.unwrap() {
         let category = file.name().unwrap().to_string();

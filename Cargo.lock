@@ -1579,6 +1579,8 @@ dependencies = [
  "anyhow",
  "bytes",
  "futures",
+ "log",
+ "log4rs",
  "reqwest",
  "serde",
  "serde_json",
@@ -1594,6 +1596,8 @@ name = "twist_drive_core"
 version = "0.1.0"
 dependencies = [
  "base16ct",
+ "log",
+ "log4rs",
  "serde",
  "serde_json",
  "sha2",

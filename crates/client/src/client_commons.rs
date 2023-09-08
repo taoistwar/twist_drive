@@ -7,12 +7,15 @@ pub use client_errors::*;
 
 use structopt::StructOpt;
 
+use crate::init_log;
+
 pub async fn execute() -> anyhow::Result<()> {
     let args = Opt::from_args_safe()?;
     parse(&args).await
 }
 
 async fn parse(args: &Opt) -> anyhow::Result<()> {
+    init_log(&args.mode);
     match &args.action as &str {
         "upload" | "u" => {
             crate::upload(args).await?;
@@ -21,7 +24,7 @@ async fn parse(args: &Opt) -> anyhow::Result<()> {
             crate::download(args).await?;
         }
         _ => {
-            print!("xx");
+            print!("unknown action:{}", &args.action);
         }
     }
     Ok(())
