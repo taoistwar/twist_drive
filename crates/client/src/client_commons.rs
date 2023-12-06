@@ -6,8 +6,7 @@ pub use client_constants::*;
 pub use client_errors::*;
 
 use structopt::StructOpt;
-
-use crate::init_log;
+use twist_drive_core::init_logs;
 
 pub async fn execute() -> anyhow::Result<()> {
     let args = Opt::from_args_safe()?;
@@ -15,7 +14,7 @@ pub async fn execute() -> anyhow::Result<()> {
 }
 
 async fn parse(args: &Opt) -> anyhow::Result<()> {
-    init_log(&args.mode);
+    init_logs(&args.mode);
     match &args.action as &str {
         "upload" | "u" => {
             crate::upload(args).await?;

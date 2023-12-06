@@ -1,7 +1,7 @@
-mod file;
+mod files;
 mod logs;
 
-pub use file::*;
+pub use files::*;
 pub use logs::*;
 
 pub fn add(left: usize, right: usize) -> usize {
@@ -14,7 +14,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = file::file_hash("cargo.toml");
+        let result = files::file_hash("cargo.toml");
         println!("{}", result);
     }
 }

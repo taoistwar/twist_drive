@@ -33,7 +33,7 @@ pub fn init_logs(mode: &str) {
     init_stdout_logs(LevelFilter::Info);
 }
 
-pub fn init_stdout_logs(level: LevelFilter) {
+pub(crate) fn init_stdout_logs(level: LevelFilter) {
     let stdout: ConsoleAppender = ConsoleAppender::builder()
         .encoder(Box::new(JsonEncoder::new()))
         .build();
