@@ -19,3 +19,4 @@ tokio-util = { version = "0.7.8", features = ["io"] }
 twist_drive_core = { path = "../core" }
 tower = { version = "0.4", features = ["util"] }
 tower-http = { version = "0.4", features = ["fs", "trace"] }
+anyhow = "1.0.75"

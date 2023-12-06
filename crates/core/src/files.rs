@@ -14,17 +14,17 @@ pub fn bytes_hash(data: &[u8]) -> String {
 }
 
 /// 获取文件的hash码（sha-256），功能和sha256sum类似。
-pub fn file_hash(file: &str) -> String {
+pub fn file_hash(file: &str) -> anyhow::Result<String> {
     let mut hash = Sha256::new();
     use std::io::prelude::*;
-    let mut f = std::fs::File::open(file).unwrap();
+    let mut f = std::fs::File::open(file)?;
     let mut buf = vec![0; 1024];
     loop {
         let n = f.read(&mut buf[..]);
         if n.is_err() {
             break;
         }
-        let n = n.unwrap();
+        let n = n?;
         if n == 0 {
             break;
         }
@@ -33,7 +33,7 @@ pub fn file_hash(file: &str) -> String {
     }
     let res = hash.finalize();
 
-    base16ct::lower::encode_string(&res)
+    Ok(base16ct::lower::encode_string(&res))
 }
 
 /// 获取文件名称，
@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn test_file_hash() {
-        let hash = file_hash("/mnt/e/app/vam/VaM.exe");
+        let hash = file_hash("/mnt/e/app/vam/VaM.exe").unwrap();
         assert_eq!(
             hash,
             "9f5959a81214322c8246d4915308bceb06ad23f9675b20b9e88b39e028a93bfd"

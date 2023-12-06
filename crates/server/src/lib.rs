@@ -24,3 +24,10 @@ pub fn address() -> SocketAddr {
         Err(_) => panic!("address fail:{}", address),
     }
 }
+
+pub fn gen_real_path(relative_path: &str) -> String {
+    let mut dir = DATA_DIR.get().unwrap().clone();
+    dir.push('/');
+    dir.push_str(relative_path);
+    dir
+}

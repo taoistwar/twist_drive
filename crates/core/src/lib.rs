@@ -14,7 +14,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = files::file_hash("cargo.toml");
+        let result = files::file_hash("cargo.toml").unwrap();
         println!("{}", result);
     }
 }

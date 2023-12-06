@@ -9,13 +9,26 @@
       "request": "launch",
       "name": "twist_drive_client upload demo",
       "cargo": {
-        "args": ["build", "--bin=twist_drive_client", "--package=twist_drive_client"],
+        "args": [
+          "build",
+          "--bin=twist_drive_client",
+          "--package=twist_drive_client"
+        ],
         "filter": {
           "name": "twist_drive_client",
           "kind": "bin"
         }
       },
-      "args": ["-a", "upload", "-s", "localhost:3000", "-r", "logs", "-l", "README.md"],
+      "args": [
+        "-a",
+        "upload",
+        "-s",
+        "localhost:3000",
+        "-r",
+        "/",
+        "-l",
+        "crates"
+      ],
       "cwd": "${workspaceFolder}"
     },
     {
@@ -23,13 +36,26 @@
       "request": "launch",
       "name": "twist_drive_client upload demo 150",
       "cargo": {
-        "args": ["build", "--bin=twist_drive_client", "--package=twist_drive_client"],
+        "args": [
+          "build",
+          "--bin=twist_drive_client",
+          "--package=twist_drive_client"
+        ],
         "filter": {
           "name": "twist_drive_client",
           "kind": "bin"
         }
       },
-      "args": ["-a", "upload", "-s", "172.16.208.150:3000", "-r", "logs", "-l", "README.md"],
+      "args": [
+        "-a",
+        "upload",
+        "-s",
+        "172.16.208.150:3000",
+        "-r",
+        "logs",
+        "-l",
+        "README.md"
+      ],
       "cwd": "${workspaceFolder}"
     },
     {
@@ -37,13 +63,44 @@
       "request": "launch",
       "name": "twist_drive_client download demo",
       "cargo": {
-        "args": ["build", "--bin=twist_drive_client", "--package=twist_drive_client"],
+        "args": [
+          "build",
+          "--bin=twist_drive_client",
+          "--package=twist_drive_client"
+        ],
         "filter": {
           "name": "twist_drive_client",
           "kind": "bin"
         }
       },
-      "args": ["-a", "download", "-s", "localhost:3000", "-r", "logs/test/winhttp.dll", "-l", "tmp"],
+      "args": [
+        "-a",
+        "download",
+        "-s",
+        "localhost:3000",
+        "-r",
+        "logs/test/winhttp.dll",
+        "-l",
+        "tmp"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "server main",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=twist_drive_server",
+          "--package=twist_drive_server"
+        ],
+        "filter": {
+          "name": "twist_drive_server",
+          "kind": "bin"
+        }
+      },
+      "args": [],
       "cwd": "${workspaceFolder}"
     }
   ]

@@ -5,12 +5,16 @@ use structopt::StructOpt;
 pub struct Opt {
     #[structopt(short = "a", long = "action", default_value = "download")]
     pub action: String,
+
     #[structopt(short = "s", long = "server")]
     pub server: String,
+
     #[structopt(short = "l", long = "local-data-dir")]
     pub local_data_dir: String,
+
     #[structopt(short = "r", long = "remote-data-dir")]
     pub remote_data_dir: String,
+
     #[structopt(short = "m", long = "mode", default_value = "dev")]
     pub mode: String,
 

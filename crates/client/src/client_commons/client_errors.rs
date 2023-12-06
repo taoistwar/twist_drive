@@ -6,18 +6,25 @@ use thiserror::Error;
 pub enum ClientError {
     #[error("get metadata fail")]
     Metadata(io::Error),
+
     #[error("get file name fail: {path:?}")]
     FileName { path: String },
+
     #[error("get file parent fail: {path:?}")]
     FileParent { path: String },
+
     #[error("connect fail")]
     Reqwest(#[from] reqwest::Error),
+
     #[error("io fail")]
     IO(#[from] std::io::Error),
+
     #[error("fail: {msg:?}")]
     ActionFail { msg: String },
+
     #[error("serde json fail")]
     SerdeJson(#[from] serde_json::Error),
+
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

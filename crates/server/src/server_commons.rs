@@ -8,19 +8,11 @@ pub use server_arguments::*;
 pub use server_constants::*;
 use tower_http::services::ServeDir;
 
-use std::path::Path;
-
-use log::LevelFilter;
-use log4rs::{
-    append::console::ConsoleAppender,
-    config::{Appender, Root},
-    encode::json::JsonEncoder,
-};
-
 use crate::{
     address, {exists_route, upload_route},
 };
 
+// TODO ENV,手动指定: host, port, data_dir
 pub async fn startup() {
     crate::init();
     // build our application with a single route

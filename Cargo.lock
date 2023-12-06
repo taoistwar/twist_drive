@@ -54,6 +54,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bddcadddf5e9015d310179a59bb28c4d4b9920ad0f11e8e14dbadf654890c9a6"
 
 [[package]]
+name = "async-recursion"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fd55a5ba1179988837d24ab4c7cc8ed6efdeff578ede0416b4225a5fca35bd0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.29",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.73"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1577,6 +1588,7 @@ name = "twist_drive_client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-recursion",
  "bytes",
  "futures",
  "log",
@@ -1595,6 +1607,7 @@ dependencies = [
 name = "twist_drive_core"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "base16ct",
  "log",
  "log4rs",
@@ -1607,6 +1620,7 @@ dependencies = [
 name = "twist_drive_server"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
  "chrono",
  "log",
