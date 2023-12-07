@@ -31,3 +31,4 @@ pub fn gen_real_path(relative_path: &str) -> String {
     dir.push_str(relative_path);
     dir
 }
+static EMPTY_FILE_SHA2: &str = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";

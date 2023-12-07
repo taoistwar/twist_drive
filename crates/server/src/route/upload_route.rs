@@ -3,7 +3,7 @@ use axum::{body::Bytes, extract::Multipart, http::StatusCode, Json};
 use std::{fmt::Display, fs, path::Path};
 use twist_drive_core::{bytes_hash_sha_256, file_hash_sha_256, CommonResp};
 
-use crate::gen_real_path;
+use crate::{gen_real_path, EMPTY_FILE_SHA2};
 use std::io::prelude::*;
 
 use super::{resp_err, resp_ok};
@@ -51,10 +51,7 @@ pub async fn upload_route(files: Multipart) -> (StatusCode, Json<CommonResp>) {
         let msg = format!("file field name missing, {}", body);
         return resp_err(&msg);
     }
-    if data.is_none() {
-        let msg = format!("file field data missing, {}", body);
-        return resp_err(&msg);
-    }
+
     if body.path.is_none() {
         let msg = format!("file field path missing, {}", body);
         return resp_err(&msg);
@@ -64,23 +61,40 @@ pub async fn upload_route(files: Multipart) -> (StatusCode, Json<CommonResp>) {
         let msg = format!("file field hash missing, {}", body);
         return resp_err(&msg);
     }
-    let data = data.unwrap();
-    if data.is_empty() {
-        let msg = format!("file field data empty, {}", body);
-        return resp_err(&msg);
-    }
     let hash = body.hash.clone().unwrap();
-    if !bytes_hash_sha_256(&data).eq_ignore_ascii_case(&hash) {
-        let msg = format!("file data & hash not match, {}", body);
-        return resp_err(&msg);
-    }
-    let name = body.name.unwrap();
-    let force = body.force.unwrap();
-    match save_file(&name, &path, &data, &hash, force) {
-        Ok(_) => resp_ok("had saved"),
-        Err(err) => {
-            print!("{}", err.to_string());
-            resp_err(&(err.to_string() + ", path:" + &path))
+    let name = body.name.clone().unwrap();
+    let force = body.force.clone().unwrap();
+    if hash.eq_ignore_ascii_case(EMPTY_FILE_SHA2) {
+        // 忽略 data 验证
+        if let Some(x) = data {
+            if x.len() != 0 {
+                let msg = format!("data of empty file must empty, {}", body);
+                return resp_err(&msg);
+            }
+        }
+        match save_file(&name, &path, None, &hash, force, true) {
+            Ok(_) => resp_ok("had saved"),
+            Err(err) => {
+                print!("{}", err.to_string());
+                resp_err(&(err.to_string() + ", path:" + &path))
+            }
+        }
+    } else {
+        if data.is_none() {
+            let msg = format!("file field data missing, {}", body);
+            return resp_err(&msg);
+        }
+        let data = data.unwrap();
+        if !bytes_hash_sha_256(&data).eq_ignore_ascii_case(&hash) {
+            let msg = format!("file data & hash not match, {}", body);
+            return resp_err(&msg);
+        }
+        match save_file(&name, &path, Some(data), &hash, force, false) {
+            Ok(_) => resp_ok("had saved"),
+            Err(err) => {
+                print!("{}", err.to_string());
+                resp_err(&(err.to_string() + ", path:" + &path))
+            }
         }
     }
 }
@@ -126,7 +140,14 @@ async fn parse_input(mut files: Multipart) -> Result<(Option<Bytes>, UploadBody)
     Ok((data, body))
 }
 
-fn save_file(name: &str, path: &str, data: &Bytes, hash: &str, force: bool) -> anyhow::Result<()> {
+fn save_file(
+    name: &str,
+    path: &str,
+    data: Option<Bytes>,
+    hash: &str,
+    force: bool,
+    is_empty_file: bool,
+) -> anyhow::Result<()> {
     let file = if path.ends_with(name) {
         path.to_owned()
     } else {
@@ -150,8 +171,9 @@ fn save_file(name: &str, path: &str, data: &Bytes, hash: &str, force: bool) -> a
     }
 
     let mut f = fs::File::create(&path)?;
-    f.write_all(data)?;
-    f.flush()?; // TODO 流式保存
-
+    if !is_empty_file {
+        f.write_all(&data.unwrap())?;
+        f.flush()?; // TODO 流式保存
+    }
     Ok(())
 }

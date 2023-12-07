@@ -4,11 +4,9 @@ use log::debug;
 use std::{fs, path::Path};
 use twist_drive_core::{file_hash_sha_256, CommonResp, FileSign};
 
-use crate::gen_real_path;
+use crate::{gen_real_path, EMPTY_FILE_SHA2};
 
 use super::{resp_err, resp_ok};
-
-static EMPTY_FILE_SHA2: &str = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
 pub async fn exists_route(Json(payload): Json<FileSign>) -> (StatusCode, Json<CommonResp>) {
     // validate input

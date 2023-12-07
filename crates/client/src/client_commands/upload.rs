@@ -122,7 +122,7 @@ async fn do_upload_file(
         let response = serde_json::from_str::<CommonResp>(body)?;
         debug!("upload response: {:?}", &response);
         if !response.status {
-            println!("upload fail");
+            println!("upload fail,file:{}, msg:{}", local_data_dir, response.msg);
             return Err(ClientError::ActionFail { msg: response.msg });
         }
         return Ok(());
