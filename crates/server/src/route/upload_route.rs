@@ -1,41 +1,81 @@
 use anyhow::Result;
 use axum::{body::Bytes, extract::Multipart, http::StatusCode, Json};
-use std::{fs, path::Path};
-use twist_drive_core::{bytes_hash, file_hash, CommonResp};
+use std::{fmt::Display, fs, path::Path};
+use twist_drive_core::{bytes_hash_sha_256, file_hash_sha_256, CommonResp};
 
 use crate::gen_real_path;
 use std::io::prelude::*;
 
 use super::{resp_err, resp_ok};
 
+struct UploadBody {
+    name: Option<String>,
+    path: Option<String>,
+    hash: Option<String>,
+    force: Option<bool>,
+}
+impl UploadBody {
+    fn new(
+        name: Option<String>,
+        path: Option<String>,
+        hash: Option<String>,
+        force: Option<bool>,
+    ) -> UploadBody {
+        UploadBody {
+            name,
+            path,
+            hash,
+            force,
+        }
+    }
+}
+impl Display for UploadBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "name:{}, path:{}, hash:{}, force:{}",
+            self.name.as_ref().unwrap_or(&"".to_string()),
+            self.path.as_ref().unwrap_or(&"".to_string()),
+            self.hash.as_ref().unwrap_or(&"".to_string()),
+            self.force.unwrap_or(false)
+        )
+    }
+}
+
 pub async fn upload_route(files: Multipart) -> (StatusCode, Json<CommonResp>) {
-    let (data, name, path, hash, force) = match parse_input(files).await {
+    let (data, body) = match parse_input(files).await {
         Ok(x) => x,
         Err(msg) => return resp_err(&msg),
     };
-    if name.is_none() {
-        return resp_err("file field name missing");
+    if body.name.is_none() {
+        let msg = format!("file field name missing, {}", body);
+        return resp_err(&msg);
     }
     if data.is_none() {
-        return resp_err("file field data missing");
+        let msg = format!("file field data missing, {}", body);
+        return resp_err(&msg);
     }
-    if path.is_none() {
-        return resp_err("path field missing");
+    if body.path.is_none() {
+        let msg = format!("file field path missing, {}", body);
+        return resp_err(&msg);
     }
-    if hash.is_none() {
-        return resp_err("hash field missing");
+    let path: String = body.path.clone().unwrap();
+    if body.hash.is_none() {
+        let msg = format!("file field hash missing, {}", body);
+        return resp_err(&msg);
     }
     let data = data.unwrap();
     if data.is_empty() {
-        return resp_err("file data empty");
+        let msg = format!("file field data empty, {}", body);
+        return resp_err(&msg);
     }
-    let hash = hash.unwrap();
-    if !bytes_hash(&data).eq_ignore_ascii_case(&hash) {
-        return resp_err("file data & hash(sha-2) not match");
+    let hash = body.hash.clone().unwrap();
+    if !bytes_hash_sha_256(&data).eq_ignore_ascii_case(&hash) {
+        let msg = format!("file data & hash not match, {}", body);
+        return resp_err(&msg);
     }
-    let name = name.unwrap();
-    let path = path.unwrap();
-    let force = force.unwrap();
+    let name = body.name.unwrap();
+    let force = body.force.unwrap();
     match save_file(&name, &path, &data, &hash, force) {
         Ok(_) => resp_ok("had saved"),
         Err(err) => {
@@ -45,18 +85,7 @@ pub async fn upload_route(files: Multipart) -> (StatusCode, Json<CommonResp>) {
     }
 }
 
-async fn parse_input(
-    mut files: Multipart,
-) -> Result<
-    (
-        Option<Bytes>,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        Option<bool>,
-    ),
-    String,
-> {
+async fn parse_input(mut files: Multipart) -> Result<(Option<Bytes>, UploadBody), String> {
     let mut data: Option<Bytes> = None;
     let mut name: Option<String> = None;
     let mut path: Option<String> = None;
@@ -93,7 +122,8 @@ async fn parse_input(
             return Err(format!("unknown field:{category}"));
         }
     }
-    Ok((data, name, path, hash, force))
+    let body = UploadBody::new(name, path, hash, force);
+    Ok((data, body))
 }
 
 fn save_file(name: &str, path: &str, data: &Bytes, hash: &str, force: bool) -> anyhow::Result<()> {
@@ -106,7 +136,7 @@ fn save_file(name: &str, path: &str, data: &Bytes, hash: &str, force: bool) -> a
     let path = Path::new(&file);
     if path.exists() {
         if force {
-            if file_hash(&path.to_string_lossy())? != hash {
+            if file_hash_sha_256(&path.to_string_lossy())? != hash {
                 // 如果hash相同, 就不需要再保存了
                 fs::remove_file(path)?;
             }

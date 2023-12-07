@@ -1,6 +1,7 @@
 mod server_arguments;
 mod server_constants;
 use axum::{
+    extract::DefaultBodyLimit,
     routing::{get, post},
     Router,
 };
@@ -23,6 +24,7 @@ pub async fn startup() {
         .route("/", get(|| async { "Hello, World!" }))
         .route("/api/exists", post(exists_route))
         .route("/api/upload", post(upload_route))
+        .layer(DefaultBodyLimit::max(32 * 1024 * 1024 * 1024))
         .nest_service("/api/download", download_serve);
 
     // run it with hyper on localhost:3000

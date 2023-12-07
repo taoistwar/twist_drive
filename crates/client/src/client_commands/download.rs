@@ -4,13 +4,13 @@ use std::{
 };
 
 use anyhow::Context;
-use twist_drive_core::{file_hash, FileSign};
+use twist_drive_core::{file_hash_sha_256, FileSign};
 
 use crate::{ClientError, Opt};
 
 pub async fn download(args: &Opt) -> anyhow::Result<(), ClientError> {
     if Path::new(&args.local_data_dir).exists() {
-        let hash = file_hash(&args.local_data_dir)?;
+        let hash = file_hash_sha_256(&args.local_data_dir)?;
         let meta = fs::metadata(&args.local_data_dir)
             .with_context(|| format!("get file meta fail: {}", &args.local_data_dir))?;
 

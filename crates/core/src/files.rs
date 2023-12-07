@@ -1,24 +1,29 @@
-use std::path::Path;
+use std::{path::Path, time::Instant};
 
+use log::debug;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::ffi::OsStr;
 
 /// 获取二进制的hash码（sha-256），功能和sha256sum类似。
-pub fn bytes_hash(data: &[u8]) -> String {
+pub fn bytes_hash_sha_256(data: &[u8]) -> String {
+    let start = Instant::now();
     let mut hash = Sha256::new();
     hash.update(data);
     let res = hash.finalize();
 
-    base16ct::lower::encode_string(&res)
+    let res = base16ct::lower::encode_string(&res);
+    let stop = Instant::now();
+    debug!("hash use time:{}", stop.duration_since(start).as_millis());
+    res
 }
 
 /// 获取文件的hash码（sha-256），功能和sha256sum类似。
-pub fn file_hash(file: &str) -> anyhow::Result<String> {
+pub fn file_hash_sha_256(file: &str) -> anyhow::Result<String> {
     let mut hash = Sha256::new();
     use std::io::prelude::*;
     let mut f = std::fs::File::open(file)?;
-    let mut buf = vec![0; 1024];
+    let mut buf = vec![0; 1024 * 1024 * 512];
     loop {
         let n = f.read(&mut buf[..]);
         if n.is_err() {
@@ -96,7 +101,7 @@ mod tests {
     #[test]
     fn test_bytes_hash() {
         let bytes = b"example byte string!";
-        let hash = bytes_hash(bytes);
+        let hash = bytes_hash_sha_256(bytes);
         assert_eq!(
             hash,
             "9c1ea8a05f5ad0373a804afe899fbb3e90ddf3d8ffe307992f66150f371df552"
@@ -105,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_file_hash() {
-        let hash = file_hash("/mnt/e/app/vam/VaM.exe").unwrap();
+        let hash = file_hash_sha_256("/mnt/e/app/vam/VaM.exe").unwrap();
         assert_eq!(
             hash,
             "9f5959a81214322c8246d4915308bceb06ad23f9675b20b9e88b39e028a93bfd"

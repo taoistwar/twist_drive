@@ -4,10 +4,11 @@ use async_recursion::async_recursion;
 use log::{debug, error};
 use reqwest::{
     multipart::{Form, Part},
-    Client, Method,
+    Body, Client, Method,
 };
 use std::{fs, path::Path};
-use twist_drive_core::{file_hash, CommonResp, FileSign};
+use tokio_util::codec::{BytesCodec, FramedRead};
+use twist_drive_core::{file_hash_sha_256, CommonResp, FileSign};
 
 fn is_default(data: &str) -> bool {
     data.is_empty() || data == "/" || data == r"\"
@@ -70,7 +71,8 @@ async fn do_upload_file(
     local_data_dir: &str,
     remote_data_dir: &str,
 ) -> Result<(), ClientError> {
-    let hash = file_hash(local_data_dir)?;
+    println!("{}", local_data_dir);
+    let hash = file_hash_sha_256(local_data_dir)?;
     let meta = fs::metadata(local_data_dir).context("read meta fail")?;
     let remote_data_dir = if remote_data_dir.is_empty() {
         local_data_dir
@@ -79,7 +81,6 @@ async fn do_upload_file(
     };
     debug!("check file hash is exists...");
     if is_exists(&hash, &remote_data_dir, meta.len(), server).await? {
-        error!("file exists:{}", remote_data_dir);
         return Ok(());
     }
     debug!("start upload file...");
@@ -99,9 +100,14 @@ async fn do_upload_file(
     let client = reqwest::Client::builder().build()?;
 
     let url = format!("http://{}/api/upload", server);
-    let data = std::fs::read(local_data_dir.to_string().clone())?;
-    let part = Part::bytes(data);
-    let part = part.file_name(file_name);
+    // let data = std::fs::read(local_data_dir.to_string().clone())?;
+    // let part = Part::bytes(data);
+    // let part = part.file_name(file_name);
+
+    let file = tokio::fs::File::open(local_data_dir).await.unwrap();
+    let read = FramedRead::new(file, BytesCodec::new());
+    let body = Body::wrap_stream(read);
+    let part = Part::stream(body).file_name(file_name);
     let form = Form::new()
         .part("file", part)
         .text("path", remote_data_dir.to_string())

@@ -2,7 +2,7 @@ use axum::{http::StatusCode, Json};
 use log::debug;
 
 use std::{fs, path::Path};
-use twist_drive_core::{file_hash, CommonResp, FileSign};
+use twist_drive_core::{file_hash_sha_256, CommonResp, FileSign};
 
 use crate::gen_real_path;
 
@@ -42,7 +42,7 @@ pub async fn exists_route(Json(payload): Json<FileSign>) -> (StatusCode, Json<Co
         }
     }
     // hash相同
-    if let Ok(hash) = file_hash(&file) {
+    if let Ok(hash) = file_hash_sha_256(&file) {
         if hash != payload.hash {
             debug!("{} not exists", &payload.file);
             return resp_err("file sign not match, need reupload");

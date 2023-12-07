@@ -7,13 +7,13 @@ appenders:
     kind: console
     encoder:
       # log 信息模式
-      pattern: '{d} - {l} - {f} -line=>{L} - {t} - {m}{n}'
+      pattern: '{d} - {l} - {f}:{L} - {t} - {m}{n}'
   file:
     kind: file
     path: 'logs/log.log'
     encoder:
       # log 信息模式
-      pattern: '{d}-{T}-{h(-{l})} - {f} -> {L} {t} - {m} - {n}'
+      pattern: '{d}-{T}-{h(-{l})} - {f}:{L} {t} - {m} - {n}'
 
   roll: #定义 rooling_file的appenders
     kind: rolling_file
@@ -21,7 +21,7 @@ appenders:
     append: true
     encoder:
       kind: pattern
-      pattern: '{d(%+)(local)} {h({l})} [{f}-> line:{L}]  {m}-{n}'
+      pattern: '{d(%+)(local)} {h({l})} [{f}:{L}]  {m}-{n}'
     policy:
       kind: compound
       trigger:
@@ -41,3 +41,11 @@ root:
     - stdout
     # - file
     # - roll
+
+loggers:
+  twist_drive_core:
+    level: debug
+  twist_drive_client:
+    level: debug
+  twist_drive_server:
+    level: debug
